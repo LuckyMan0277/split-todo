@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test:*)",
+      "Bash(node --version:*)",
+      "Bash(npm --version:*)",
+      "Bash(npx create-expo-app@latest:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(tree:*)",
+      "Bash(package-versions.json)",
+      "Bash(cat:*)",
+      "Bash(npm run format:check:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx eslint:*)",
+      "Bash(if [ -d \"C:\\Users\\jaeyun\\Desktop\\projects\\taskmanager-mobile\\src\\store\" ])",
+      "Bash(then echo \"exists\")",
+      "Bash(else mkdir \"C:\\Users\\jaeyun\\Desktop\\projects\\taskmanager-mobile\\src\\store\")",
+      "Bash(fi)",
+      "WebFetch(domain:webaim.org)",
+      "Bash(npm test:*)",
+      "Bash(npm update:*)",
+      "Bash(npx jest:*)",
+      "Bash(test-results.txt)",
+      "Bash(npm ls:*)",
+      "WebSearch",
+      "Bash(npx expo install:*)",
+      "Bash(npm start)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill //F //PID 18680)",
+      "Bash(npm uninstall:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
