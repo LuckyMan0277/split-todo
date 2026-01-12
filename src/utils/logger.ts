@@ -10,13 +10,15 @@
  */
 const CONFIG = {
   // Enable debug logs only in development
-  enableDebug: __DEV__,
+  enableDebug: false, // Disable debug logs to reduce noise
   // Always enable error logs
   enableError: true,
   // Enable performance logs in development
-  enablePerformance: __DEV__,
+  enablePerformance: false, // Disable performance logs to reduce noise
   // Performance threshold in milliseconds (log warning if exceeded)
   performanceThreshold: 500,
+  // Enable info logs
+  enableInfo: __DEV__, // Only enable info logs in development
 };
 
 /**
@@ -155,8 +157,8 @@ function logPerformance(label: string, timeMs: number): void {
 /**
  * Logs an info message.
  *
- * Always logs informational messages (both development and production).
- * Use for important user-facing events and state changes.
+ * Only logs in development mode to reduce noise.
+ * Use for important events and state changes.
  *
  * @param message - Info message to log
  * @param data - Optional data object to log alongside the message
@@ -164,16 +166,20 @@ function logPerformance(label: string, timeMs: number): void {
  * @example
  * logger.info('Tasks loaded successfully', { count: 10 });
  * // Console output:
- * // [INFO] Tasks loaded successfully
+ * // ✓ Tasks loaded successfully
  * // { count: 10 }
  *
  * @example
  * logger.info('App initialized');
  * // Console output:
- * // [INFO] App initialized
+ * // ✓ App initialized
  */
 function info(message: string, data?: any): void {
-  console.info(`[INFO] ${message}`);
+  if (!CONFIG.enableInfo) {
+    return;
+  }
+
+  console.info(`✓ ${message}`);
   if (data !== undefined) {
     console.info(data);
   }

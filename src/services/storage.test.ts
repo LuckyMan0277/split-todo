@@ -84,9 +84,7 @@ describe('Storage Service', () => {
       const result = await loadAppData();
 
       expect(result).toEqual(createEmptyData());
-      expect(mockAsyncStorage.getItem).toHaveBeenCalledWith(
-        STORAGE_CONSTANTS.STORAGE_KEY
-      );
+      expect(mockAsyncStorage.getItem).toHaveBeenCalledWith(STORAGE_CONSTANTS.STORAGE_KEY);
     });
 
     it('should load and parse valid data', async () => {
@@ -118,14 +116,8 @@ describe('Storage Service', () => {
 
       expect(result).toEqual(validBackupData);
       expect(mockAsyncStorage.getItem).toHaveBeenCalledTimes(2);
-      expect(mockAsyncStorage.getItem).toHaveBeenNthCalledWith(
-        1,
-        STORAGE_CONSTANTS.STORAGE_KEY
-      );
-      expect(mockAsyncStorage.getItem).toHaveBeenNthCalledWith(
-        2,
-        STORAGE_CONSTANTS.BACKUP_KEY
-      );
+      expect(mockAsyncStorage.getItem).toHaveBeenNthCalledWith(1, STORAGE_CONSTANTS.STORAGE_KEY);
+      expect(mockAsyncStorage.getItem).toHaveBeenNthCalledWith(2, STORAGE_CONSTANTS.BACKUP_KEY);
     });
 
     it('should return empty data when both primary and backup fail', async () => {
@@ -139,9 +131,7 @@ describe('Storage Service', () => {
     });
 
     it('should handle AsyncStorage errors gracefully', async () => {
-      mockAsyncStorage.getItem.mockRejectedValue(
-        new Error('AsyncStorage error')
-      );
+      mockAsyncStorage.getItem.mockRejectedValue(new Error('AsyncStorage error'));
 
       const result = await loadAppData();
 
@@ -185,9 +175,7 @@ describe('Storage Service', () => {
     it('should throw error after retry fails', async () => {
       const testData = createEmptyData();
 
-      mockAsyncStorage.multiSet.mockRejectedValue(
-        new Error('Persistent failure')
-      );
+      mockAsyncStorage.multiSet.mockRejectedValue(new Error('Persistent failure'));
 
       await expect(saveAppData(testData)).rejects.toMatchObject({
         code: ErrorCode.UNKNOWN,
@@ -358,10 +346,7 @@ describe('Storage Service', () => {
     it('should successfully save and load data', async () => {
       const originalData: AppData = {
         schemaVersion: 1,
-        tasks: [
-          createTestTask('1', 'Task 1', 3, 1),
-          createTestTask('2', 'Task 2', 5, 5),
-        ],
+        tasks: [createTestTask('1', 'Task 1', 3, 1), createTestTask('2', 'Task 2', 5, 5)],
       };
 
       // Save
@@ -370,9 +355,7 @@ describe('Storage Service', () => {
 
       // Load
       const savedData = mockAsyncStorage.multiSet.mock.calls[0][0];
-      const primaryData = savedData.find(
-        ([key]) => key === STORAGE_CONSTANTS.STORAGE_KEY
-      );
+      const primaryData = savedData.find(([key]) => key === STORAGE_CONSTANTS.STORAGE_KEY);
 
       if (primaryData) {
         mockAsyncStorage.getItem.mockResolvedValue(primaryData[1]);
@@ -398,9 +381,7 @@ describe('Storage Service', () => {
       await saveAppData(largeData);
 
       const savedData = mockAsyncStorage.multiSet.mock.calls[0][0];
-      const primaryData = savedData.find(
-        ([key]) => key === STORAGE_CONSTANTS.STORAGE_KEY
-      );
+      const primaryData = savedData.find(([key]) => key === STORAGE_CONSTANTS.STORAGE_KEY);
 
       if (primaryData) {
         mockAsyncStorage.getItem.mockResolvedValue(primaryData[1]);
@@ -442,9 +423,7 @@ describe('Storage Service', () => {
     });
 
     it('should handle malformed JSON gracefully', async () => {
-      mockAsyncStorage.getItem
-        .mockResolvedValueOnce('{incomplete')
-        .mockResolvedValueOnce(null);
+      mockAsyncStorage.getItem.mockResolvedValueOnce('{incomplete').mockResolvedValueOnce(null);
 
       const result = await loadAppData();
 

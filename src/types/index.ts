@@ -29,6 +29,21 @@ export interface ChecklistItem {
    * true = completed, false = not completed
    */
   done: boolean;
+
+  /**
+   * Whether this checklist item is marked as "today's task"
+   * Used to filter items in the Today screen
+   * Default: false
+   * @deprecated Use scheduledDates instead
+   */
+  isToday?: boolean;
+
+  /**
+   * Array of dates (YYYY-MM-DD) this item is scheduled for
+   * Replaces isToday with date-specific scheduling
+   * Default: []
+   */
+  scheduledDates?: string[];
 }
 
 /**
@@ -77,6 +92,31 @@ export interface Task {
 }
 
 /**
+ * AppSettings represents user preferences and configuration
+ */
+export interface AppSettings {
+  /**
+   * Whether celebration animation is enabled on 100% completion
+   * Default: true
+   */
+  celebrationEnabled: boolean;
+
+  /**
+   * Time (in 24-hour format) to auto-save daily progress
+   * Default: 0 (midnight, 12:00 AM)
+   * Range: 0-23
+   */
+  dailySaveHour: number;
+
+  /**
+   * Which day the week starts on
+   * 0 = Sunday, 1 = Monday
+   * Default: 0 (Sunday)
+   */
+  weekStartsOn: 0 | 1;
+}
+
+/**
  * AppData represents the entire application state that is persisted to storage.
  * This is the top-level structure saved to AsyncStorage.
  */
@@ -93,6 +133,12 @@ export interface AppData {
    * Maximum 200 tasks (AsyncStorage limitation)
    */
   tasks: Task[];
+
+  /**
+   * User settings and preferences
+   * Optional for backward compatibility
+   */
+  settings?: AppSettings;
 }
 
 /**
@@ -366,12 +412,12 @@ export interface SortOptions {
  * Used for providing tactile feedback to users.
  */
 export type HapticFeedbackType =
-  | 'light'      // Light impact (checkbox toggle)
-  | 'medium'     // Medium impact (button press)
-  | 'heavy'      // Heavy impact (delete action)
-  | 'success'    // Success notification (100% completion)
-  | 'warning'    // Warning notification (limit approaching)
-  | 'error';     // Error notification (operation failed)
+  | 'light' // Light impact (checkbox toggle)
+  | 'medium' // Medium impact (button press)
+  | 'heavy' // Heavy impact (delete action)
+  | 'success' // Success notification (100% completion)
+  | 'warning' // Warning notification (limit approaching)
+  | 'error'; // Error notification (operation failed)
 
 /**
  * ToastType defines the types of toast messages that can be shown.
@@ -403,4 +449,184 @@ export interface ToastConfig {
    * Only used with 'undo' type
    */
   onUndo?: () => void;
+}
+
+/**
+ * DailyRecordItem represents a single checklist item in a daily record snapshot.
+ * This is a snapshot of the item's state at the time the record was saved.
+ */
+export interface DailyRecordItem {
+  /**
+   * Original checklist item ID
+   */
+  id: string;
+
+  /**
+   * Original task ID
+   */
+  taskId: string;
+
+  /**
+   * Task title (for grouping)
+   */
+  taskTitle: string;
+
+  /**
+   * Item title
+   */
+  title: string;
+
+  /**
+   * Completion status at snapshot time
+   */
+  done: boolean;
+
+  /**
+   * Display order within the day
+   */
+  order: number;
+}
+
+/**
+ * DailyRecord represents the completion record for a specific date.
+ * Records are automatically saved at the configured time (default: midnight).
+ *
+ * For past dates: Contains snapshot of completed/incomplete items
+ * For future dates: Contains planned items (scheduledItems)
+ */
+export interface DailyRecord {
+  /**
+   * Date in YYYY-MM-DD format (local timezone)
+   * @example "2025-11-08"
+   */
+  date: string;
+
+  /**
+   * Number of completed today items
+   */
+  completedCount: number;
+
+  /**
+   * Total number of today items
+   */
+  totalCount: number;
+
+  /**
+   * Completion percentage (0-100)
+   * Calculated as: Math.round((completedCount / totalCount) * 100)
+   * Returns 0 if totalCount is 0
+   */
+  completionRate: number;
+
+  /**
+   * ISO 8601 timestamp when this record was saved
+   * @example "2025-11-08T00:00:00.000Z"
+   */
+  savedAt: string;
+
+  /**
+   * Snapshot of checklist items for this date
+   * For past dates: items that were marked as "today" on that date
+   * For future dates: items scheduled for that date
+   * Optional for backward compatibility with old records
+   */
+  items?: DailyRecordItem[];
+}
+
+/**
+ * DailyRecordsData represents all daily records stored in the app.
+ */
+export interface DailyRecordsData {
+  /**
+   * Schema version for migrations
+   */
+  schemaVersion: number;
+
+  /**
+   * Map of date strings to daily records
+   * Key: YYYY-MM-DD format
+   */
+  records: Record<string, DailyRecord>;
+}
+
+/**
+ * SyncStatus represents the synchronization state of data with the cloud.
+ */
+export type SyncStatus = 'idle' | 'syncing' | 'success' | 'error';
+
+/**
+ * SyncConfig contains Supabase configuration and sync state.
+ */
+export interface SyncConfig {
+  /**
+   * Current sync status
+   */
+  status: SyncStatus;
+
+  /**
+   * Last successful sync timestamp (ISO 8601)
+   */
+  lastSyncedAt?: string;
+
+  /**
+   * Error message if sync failed
+   */
+  error?: string;
+
+  /**
+   * Whether cloud sync is enabled
+   * Default: false (local-only mode)
+   */
+  enabled: boolean;
+
+  /**
+   * User ID for multi-device sync (optional)
+   * Only set after authentication
+   */
+  userId?: string;
+
+  /**
+   * User email (if authenticated with email/social)
+   */
+  userEmail?: string;
+
+  /**
+   * Authentication method
+   */
+  authMethod?: 'anonymous' | 'google' | 'apple' | 'email';
+}
+
+/**
+ * Authentication provider type
+ */
+export type AuthProvider = 'google' | 'apple';
+
+/**
+ * User profile information
+ */
+export interface UserProfile {
+  /**
+   * User ID
+   */
+  id: string;
+
+  /**
+   * User email (if available)
+   */
+  email?: string;
+
+  /**
+   * Display name (if available)
+   */
+  name?: string;
+
+  /**
+   * Profile picture URL (if available)
+   */
+  avatarUrl?: string;
+
+  /**
+   * Authentication method
+   */
+  authMethod: 'anonymous' | 'google' | 'apple' | 'email';
 }

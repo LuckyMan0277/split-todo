@@ -76,16 +76,16 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
 
 const styles = StyleSheet.create({
   /**
-   * Container for the progress bar
-   * - Gray background (track)
-   * - Fixed height: 10pt (within 10-12pt range)
-   * - Rounded corners for visual appeal
+   * Container for the progress bar - Modern Design
+   * - Light background with subtle opacity
+   * - Slightly smaller height (6pt)
+   * - Larger border radius for softer look
    */
   container: {
-    height: 10,
-    backgroundColor: colors.border,
-    borderRadius: 6,
-    overflow: 'hidden', // Ensures fill respects border radius
+    height: 6,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    borderRadius: 10,
+    overflow: 'hidden',
     width: '100%',
   },
 
@@ -93,10 +93,10 @@ const styles = StyleSheet.create({
    * Fill bar that represents progress
    * - Dynamic width based on progress value
    * - Dynamic color (primary or success)
-   * - Height matches container (100%)
+   * - Smooth rounded corners
    */
   fill: {
     height: '100%',
-    borderRadius: 6, // Match container radius
+    borderRadius: 10,
   },
 });

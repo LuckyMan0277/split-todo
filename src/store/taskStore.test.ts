@@ -71,7 +71,7 @@ describe('TaskStore', () => {
       });
 
       // Wait a tick for async state updates
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Check that data was loaded into the store
       const state = useTaskStore.getState();
@@ -201,9 +201,7 @@ describe('TaskStore', () => {
 
     it('should reject when task limit (200) is reached', async () => {
       // Set up store with 200 tasks
-      const tasks = Array.from({ length: 200 }, (_, i) =>
-        createTestTask(`task-${i}`, `Task ${i}`)
-      );
+      const tasks = Array.from({ length: 200 }, (_, i) => createTestTask(`task-${i}`, `Task ${i}`));
 
       useTaskStore.setState({ tasks });
 
@@ -302,9 +300,7 @@ describe('TaskStore', () => {
         await result.current.updateTaskTitle('1', 'Updated Title');
       });
 
-      expect(result.current.tasks[0].updatedAt).not.toBe(
-        originalTask.updatedAt
-      );
+      expect(result.current.tasks[0].updatedAt).not.toBe(originalTask.updatedAt);
     });
   });
 
@@ -360,12 +356,8 @@ describe('TaskStore', () => {
 
       const afterTime = Date.now();
 
-      expect(result.current.deletedTasks[0].deletedAt).toBeGreaterThanOrEqual(
-        beforeTime
-      );
-      expect(result.current.deletedTasks[0].deletedAt).toBeLessThanOrEqual(
-        afterTime
-      );
+      expect(result.current.deletedTasks[0].deletedAt).toBeGreaterThanOrEqual(beforeTime);
+      expect(result.current.deletedTasks[0].deletedAt).toBeLessThanOrEqual(afterTime);
     });
   });
 
@@ -534,10 +526,7 @@ describe('TaskStore', () => {
 
       let response;
       await act(async () => {
-        response = await result.current.addChecklistItem(
-          'non-existent',
-          'Item'
-        );
+        response = await result.current.addChecklistItem('non-existent', 'Item');
       });
 
       expect(response.success).toBe(false);
@@ -614,9 +603,7 @@ describe('TaskStore', () => {
         result.current.toggleChecklistItem('1', 'item-1');
       });
 
-      expect(mockHaptics.impactAsync).toHaveBeenCalledWith(
-        mockHaptics.ImpactFeedbackStyle.Light
-      );
+      expect(mockHaptics.impactAsync).toHaveBeenCalledWith(mockHaptics.ImpactFeedbackStyle.Light);
     });
 
     it('should update task updatedAt timestamp', async () => {
@@ -654,11 +641,7 @@ describe('TaskStore', () => {
 
       let response;
       await act(async () => {
-        response = await result.current.updateChecklistItem(
-          '1',
-          'item-1',
-          'Updated Title'
-        );
+        response = await result.current.updateChecklistItem('1', 'item-1', 'Updated Title');
       });
 
       expect(response).toEqual({ success: true });
@@ -742,9 +725,7 @@ describe('TaskStore', () => {
       });
 
       expect(mockAsyncStorage.multiSet).toHaveBeenCalled();
-      const savedData = JSON.parse(
-        mockAsyncStorage.multiSet.mock.calls[0][0][0][1]
-      );
+      const savedData = JSON.parse(mockAsyncStorage.multiSet.mock.calls[0][0][0][1]);
       expect(savedData.tasks).toHaveLength(1);
     });
 

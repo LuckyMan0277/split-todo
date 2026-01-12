@@ -33,11 +33,9 @@ export function getUserFriendlyMessage(errorCode: ErrorCode): string {
     [ErrorCode.STORAGE_FULL]:
       '저장 공간이 부족합니다. 완료된 할 일을 삭제하거나 백업 후 초기화하세요.',
 
-    [ErrorCode.PERMISSION_DENIED]:
-      '권한이 필요합니다. 앱 설정에서 파일 접근 권한을 허용해주세요.',
+    [ErrorCode.PERMISSION_DENIED]: '권한이 필요합니다. 앱 설정에서 파일 접근 권한을 허용해주세요.',
 
-    [ErrorCode.DATA_CORRUPTED]:
-      '저장된 데이터가 손상되었습니다. 백업에서 복원을 시도합니다.',
+    [ErrorCode.DATA_CORRUPTED]: '저장된 데이터가 손상되었습니다. 백업에서 복원을 시도합니다.',
 
     [ErrorCode.TASK_LIMIT_EXCEEDED]:
       '최대 200개의 할 일만 생성할 수 있습니다. 완료된 할 일을 정리하세요.',
@@ -45,14 +43,11 @@ export function getUserFriendlyMessage(errorCode: ErrorCode): string {
     [ErrorCode.ITEM_LIMIT_EXCEEDED]:
       '최대 50개의 항목만 추가할 수 있습니다. 새로운 할 일로 분리하세요.',
 
-    [ErrorCode.INVALID_INPUT]:
-      '입력 내용을 확인해주세요. 제목은 1-120자 사이여야 합니다.',
+    [ErrorCode.INVALID_INPUT]: '입력 내용을 확인해주세요. 제목은 1-120자 사이여야 합니다.',
 
-    [ErrorCode.INVALID_BACKUP]:
-      '백업 파일이 유효하지 않습니다. 다른 파일을 선택해주세요.',
+    [ErrorCode.INVALID_BACKUP]: '백업 파일이 유효하지 않습니다. 다른 파일을 선택해주세요.',
 
-    [ErrorCode.UNKNOWN]:
-      '알 수 없는 오류가 발생했습니다. 앱을 재시작하거나 문의해주세요.',
+    [ErrorCode.UNKNOWN]: '알 수 없는 오류가 발생했습니다. 앱을 재시작하거나 문의해주세요.',
   };
 
   return messages[errorCode] || messages[ErrorCode.UNKNOWN];
@@ -99,39 +94,27 @@ export function getUserFriendlyMessage(errorCode: ErrorCode): string {
  * const error = createAppError(ErrorCode.TASK_LIMIT_EXCEEDED);
  * // Uses default message from getUserFriendlyMessage()
  */
-export function createAppError(
-  code: ErrorCode,
-  message?: string,
-  originalError?: Error
-): AppError {
+export function createAppError(code: ErrorCode, message?: string, originalError?: Error): AppError {
   // Use provided message or fall back to default user-friendly message
   const errorMessage = message || getUserFriendlyMessage(code);
 
   // Define recovery actions for each error type
   const recoveryActions: Partial<Record<ErrorCode, string>> = {
-    [ErrorCode.STORAGE_FULL]:
-      '완료된 할 일을 삭제하거나 백업 후 초기화하세요',
+    [ErrorCode.STORAGE_FULL]: '완료된 할 일을 삭제하거나 백업 후 초기화하세요',
 
-    [ErrorCode.PERMISSION_DENIED]:
-      '앱 설정에서 파일 접근 권한을 허용해주세요',
+    [ErrorCode.PERMISSION_DENIED]: '앱 설정에서 파일 접근 권한을 허용해주세요',
 
-    [ErrorCode.DATA_CORRUPTED]:
-      '백업에서 복원을 시도하거나, 데이터를 초기화하세요',
+    [ErrorCode.DATA_CORRUPTED]: '백업에서 복원을 시도하거나, 데이터를 초기화하세요',
 
-    [ErrorCode.TASK_LIMIT_EXCEEDED]:
-      '완료된 할 일을 정리하거나 백업 후 초기화하세요',
+    [ErrorCode.TASK_LIMIT_EXCEEDED]: '완료된 할 일을 정리하거나 백업 후 초기화하세요',
 
-    [ErrorCode.ITEM_LIMIT_EXCEEDED]:
-      '항목을 줄이거나 새로운 할 일로 분리하세요',
+    [ErrorCode.ITEM_LIMIT_EXCEEDED]: '항목을 줄이거나 새로운 할 일로 분리하세요',
 
-    [ErrorCode.INVALID_INPUT]:
-      '제목을 1-120자 사이로 입력해주세요',
+    [ErrorCode.INVALID_INPUT]: '제목을 1-120자 사이로 입력해주세요',
 
-    [ErrorCode.INVALID_BACKUP]:
-      '올바른 백업 파일을 선택해주세요',
+    [ErrorCode.INVALID_BACKUP]: '올바른 백업 파일을 선택해주세요',
 
-    [ErrorCode.UNKNOWN]:
-      '앱을 재시작하거나 개발자에게 문의해주세요',
+    [ErrorCode.UNKNOWN]: '앱을 재시작하거나 개발자에게 문의해주세요',
   };
 
   const appError: AppError = {

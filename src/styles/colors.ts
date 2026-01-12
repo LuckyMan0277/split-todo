@@ -22,39 +22,45 @@
  * Color token type definition
  */
 export interface Colors {
-  /** Primary brand color - Blue 500 */
+  /** Primary brand color - Indigo 500 */
   primary: string;
-  /** Darker primary for pressed states - Blue 600 */
+  /** Darker primary for pressed states - Indigo 600 */
   primaryDark: string;
-  /** Success/completion color - Green 600 (WCAG AA: 4.54:1) */
+  /** Light primary for highlights - Indigo 300 */
+  primaryLight: string;
+  /** Success/completion color - Emerald 500 */
   success: string;
-  /** Danger/error color - Red 600 (WCAG AA: 5.53:1) */
+  /** Danger/error color - Red 500 */
   danger: string;
-  /** App background color - Gray 50 */
+  /** App background color - Almost white */
   background: string;
-  /** Card/surface background color - White */
+  /** Darker background for contrast - Light gray */
+  backgroundDark: string;
+  /** Card/surface background color - Pure white */
   surface: string;
-  /** Primary text color - Gray 800 (WCAG AA: 14.82:1) */
+  /** Primary text color - Zinc 900 */
   textPrimary: string;
-  /** Secondary text color - Gray 600 (WCAG AA: 7.03:1) */
+  /** Secondary text color - Zinc 500 */
   textSecondary: string;
-  /** Disabled text color - Gray 400 */
+  /** Disabled text color - Zinc 400 */
   textDisabled: string;
-  /** Border color - Gray 200 */
+  /** Border color - Zinc 200 */
   border: string;
-  /** Divider color - Gray 200 */
+  /** Divider color - Zinc 200 */
   divider: string;
 }
 
 /**
- * Application color palette
+ * Application color palette - Modern Minimal Design
  *
  * Usage guidelines:
  * - Use `primary` for main actions, buttons, and active progress bars
  * - Use `primaryDark` for pressed/hover states
+ * - Use `primaryLight` for backgrounds and highlights
  * - Use `success` for completed states (100% progress)
  * - Use `danger` for delete actions and error states
  * - Use `background` for main app background
+ * - Use `backgroundDark` for subtle contrast areas
  * - Use `surface` for cards, modals, and elevated surfaces
  * - Use `textPrimary` for main content text
  * - Use `textSecondary` for supporting text and metadata
@@ -63,15 +69,17 @@ export interface Colors {
  * - Use `divider` for separating content sections
  */
 export const colors: Colors = {
-  primary: '#3b82f6',       // Blue 500 - Main brand color
-  primaryDark: '#2563eb',   // Blue 600 - Pressed/hover states
-  success: '#059669',       // Green 600 - WCAG AA compliant (4.54:1)
-  danger: '#dc2626',        // Red 600 - WCAG AA compliant (5.53:1)
-  background: '#f9fafb',    // Gray 50 - App background
-  surface: '#ffffff',       // White - Cards, modals
-  textPrimary: '#1f2937',   // Gray 800 - Main text (14.82:1)
-  textSecondary: '#4b5563', // Gray 600 - Supporting text (7.03:1)
-  textDisabled: '#9ca3af',  // Gray 400 - Disabled states
-  border: '#e5e7eb',        // Gray 200 - Borders
-  divider: '#e5e7eb',       // Gray 200 - Dividers
+  primary: '#6366f1', // Indigo 500 - Main brand color
+  primaryDark: '#4f46e5', // Indigo 600 - Pressed/hover states
+  primaryLight: '#a5b4fc', // Indigo 300 - Light accent
+  success: '#10b981', // Emerald 500 - Completed states
+  danger: '#ef4444', // Red 500 - Delete actions
+  background: '#fafafa', // Almost white - App background
+  backgroundDark: '#f5f5f5', // Light gray - Subtle contrast
+  surface: '#ffffff', // Pure white - Cards, modals
+  textPrimary: '#18181b', // Zinc 900 - Main text
+  textSecondary: '#71717a', // Zinc 500 - Supporting text
+  textDisabled: '#a1a1aa', // Zinc 400 - Disabled states
+  border: '#e4e4e7', // Zinc 200 - Borders
+  divider: '#e4e4e7', // Zinc 200 - Dividers
 } as const;

@@ -29,7 +29,16 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(taskkill //F //PID 18680)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(taskkill /F /PID 11648)",
+      "Bash(taskkill //F //PID 11648)",
+      "Bash(timeout /t 10)",
+      "Bash(npx prettier:*)",
+      "Bash(taskkill:*)",
+      "Bash(timeout /t 5)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run format:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

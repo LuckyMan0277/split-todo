@@ -5,6 +5,7 @@
 ## 📋 프로젝트 문서
 
 작업 시작 전 반드시 다음 프로젝트 문서를 확인하세요:
+
 - **tasks.md**: 전체 개발 작업 목록 및 저장소 요구사항
 - **app-plan.md**: 앱 기획서 및 데이터 저장 방식
 
@@ -32,11 +33,13 @@
 ## 구현 요구사항
 
 ### Storage Keys
+
 - APP_DATA_KEY = 'APP_DATA'
 - APP_DATA_BACKUP_KEY = 'APP_DATA_BACKUP'
 - DEFAULT_SCHEMA_VERSION = 1
 
 ### loadAppData()
+
 1. AsyncStorage.getItem(APP_DATA_KEY)
 2. 데이터 없으면 빈 AppData 반환
 3. schemaVersion 체크 후 마이그레이션
@@ -44,12 +47,14 @@
 5. 모두 실패하면 빈 AppData 반환
 
 ### saveAppData()
+
 1. JSON.stringify로 직렬화
 2. APP_DATA와 APP_DATA_BACKUP 동시 저장
 3. 실패 시 1회 재시도
 4. 재시도 실패 시 에러 throw
 
 ### 마이그레이션
+
 - createEmptyAppData(): AppData
 - migrateAppData(oldData: any): AppData
 - migrateTask(task: any): Task

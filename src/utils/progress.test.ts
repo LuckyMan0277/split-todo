@@ -50,11 +50,7 @@ describe('calcProgress', () => {
 
   describe('All items completed', () => {
     it('should return 100% progress when all items are done', () => {
-      const task = createMockTask([
-        { done: true },
-        { done: true },
-        { done: true },
-      ]);
+      const task = createMockTask([{ done: true }, { done: true }, { done: true }]);
       const progress = calcProgress(task);
 
       expect(progress).toEqual({
@@ -78,11 +74,7 @@ describe('calcProgress', () => {
 
   describe('No items completed', () => {
     it('should return 0% progress when no items are done', () => {
-      const task = createMockTask([
-        { done: false },
-        { done: false },
-        { done: false },
-      ]);
+      const task = createMockTask([{ done: false }, { done: false }, { done: false }]);
       const progress = calcProgress(task);
 
       expect(progress).toEqual({
@@ -112,11 +104,7 @@ describe('calcProgress', () => {
     });
 
     it('should calculate correct percentage for 1 out of 3 items', () => {
-      const task = createMockTask([
-        { done: true },
-        { done: false },
-        { done: false },
-      ]);
+      const task = createMockTask([{ done: true }, { done: false }, { done: false }]);
       const progress = calcProgress(task);
 
       expect(progress).toEqual({
@@ -127,11 +115,7 @@ describe('calcProgress', () => {
     });
 
     it('should calculate correct percentage for 2 out of 3 items', () => {
-      const task = createMockTask([
-        { done: true },
-        { done: true },
-        { done: false },
-      ]);
+      const task = createMockTask([{ done: true }, { done: true }, { done: false }]);
       const progress = calcProgress(task);
 
       expect(progress).toEqual({
@@ -160,9 +144,11 @@ describe('calcProgress', () => {
 
   describe('Large number of items', () => {
     it('should handle 50 items (max limit)', () => {
-      const items = Array(50).fill(null).map((_, i) => ({
-        done: i < 25, // First 25 completed
-      }));
+      const items = Array(50)
+        .fill(null)
+        .map((_, i) => ({
+          done: i < 25, // First 25 completed
+        }));
       const task = createMockTask(items);
       const progress = calcProgress(task);
 
@@ -174,9 +160,11 @@ describe('calcProgress', () => {
     });
 
     it('should handle tasks with many items efficiently', () => {
-      const items = Array(100).fill(null).map((_, i) => ({
-        done: i % 3 === 0, // Every third item completed
-      }));
+      const items = Array(100)
+        .fill(null)
+        .map((_, i) => ({
+          done: i % 3 === 0, // Every third item completed
+        }));
       const task = createMockTask(items);
       const progress = calcProgress(task);
 
@@ -199,17 +187,14 @@ describe('calcProgress', () => {
     });
 
     it('should not mutate the original task object', () => {
-      const task = createMockTask([
-        { done: true },
-        { done: false },
-      ]);
+      const task = createMockTask([{ done: true }, { done: false }]);
       const originalItemsLength = task.items.length;
-      const originalDoneCount = task.items.filter(item => item.done).length;
+      const originalDoneCount = task.items.filter((item) => item.done).length;
 
       calcProgress(task);
 
       expect(task.items.length).toBe(originalItemsLength);
-      expect(task.items.filter(item => item.done).length).toBe(originalDoneCount);
+      expect(task.items.filter((item) => item.done).length).toBe(originalDoneCount);
     });
   });
 });

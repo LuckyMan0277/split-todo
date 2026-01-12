@@ -1,10 +1,11 @@
 /**
  * Storage Service Module
  *
- * Provides AsyncStorage-based persistence layer for the Split TODO application.
+ * Provides encrypted storage-based persistence layer for the Split TODO application.
  * Handles data loading, saving, backup/recovery, schema migrations, and automatic cleanup.
  *
  * Features:
+ * - Platform-native encryption (iOS: Keychain, Android: EncryptedSharedPreferences)
  * - Automatic backup on every save
  * - 1 retry on save failure
  * - Backup recovery on load failure
@@ -14,12 +15,12 @@
  * - Comprehensive error handling with AppError
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppData, ErrorCode } from '../types';
 import { isValidAppData } from '../utils/validation';
 import { calculateStorageSize, checkStorageLimit } from '../utils/validation';
 import { createAppError, logAppError } from '../utils/errors';
 import { logger } from '../utils/logger';
+import { saveEncrypted, loadEncrypted } from './encryptedStorage';
 
 // ============================================================================
 // CONSTANTS
@@ -89,31 +90,19 @@ export async function loadAppData(): Promise<AppData> {
   const timer = logger.startTimer('Load app data');
 
   try {
-    logger.debug('Loading data from AsyncStorage', { key: STORAGE_KEY });
+    logger.debug('Loading data from EncryptedStorage', { key: STORAGE_KEY });
 
-    // Step 1: Load from primary storage
-    const rawData = await AsyncStorage.getItem(STORAGE_KEY);
+    // Step 1: Load from primary storage (encrypted)
+    const parsedData = await loadEncrypted<AppData>(STORAGE_KEY);
 
     // Step 2: If no data exists, return empty data
-    if (!rawData) {
+    if (!parsedData) {
       logger.info('No existing data found, returning empty data');
       timer.end();
       return createEmptyData();
     }
 
-    // Step 3: Parse JSON data
-    let parsedData: any;
-    try {
-      parsedData = JSON.parse(rawData);
-    } catch (parseError) {
-      logger.error('Failed to parse data JSON, attempting backup recovery', parseError as Error);
-      // Try loading from backup
-      const backupData = await loadFromBackup();
-      timer.end();
-      return backupData;
-    }
-
-    // Step 4: Validate data structure
+    // Step 3: Validate data structure
     if (!isValidAppData(parsedData)) {
       logger.warn('Data validation failed, attempting backup recovery');
       const backupData = await loadFromBackup();
@@ -121,7 +110,7 @@ export async function loadAppData(): Promise<AppData> {
       return backupData;
     }
 
-    // Step 5: Run schema migration if needed
+    // Step 4: Run schema migration if needed
     const migratedData = migrateSchema(parsedData);
 
     logger.info('Data loaded successfully', {
@@ -148,12 +137,12 @@ export async function loadAppData(): Promise<AppData> {
 }
 
 /**
- * Saves application data to AsyncStorage with backup and retry logic.
+ * Saves application data to encrypted storage with backup and retry logic.
  *
  * Implements a robust saving strategy:
  * 1. Validate storage size (5MB limit)
  * 2. If size exceeded, auto-cleanup old completed tasks
- * 3. Save to both primary storage (APP_DATA) and backup (APP_DATA_BACKUP)
+ * 3. Save to both primary storage (APP_DATA) and backup (APP_DATA_BACKUP) with encryption
  * 4. If save fails, retry once
  * 5. If retry fails, throw AppError
  *
@@ -414,14 +403,12 @@ async function loadFromBackup(): Promise<AppData> {
   try {
     logger.info('Attempting to load from backup');
 
-    const backupData = await AsyncStorage.getItem(BACKUP_KEY);
+    const parsedBackup = await loadEncrypted<AppData>(BACKUP_KEY);
 
-    if (!backupData) {
+    if (!parsedBackup) {
       logger.warn('No backup data found');
       return createEmptyData();
     }
-
-    const parsedBackup = JSON.parse(backupData);
 
     if (!isValidAppData(parsedBackup)) {
       logger.error('Backup data validation failed');
@@ -461,14 +448,8 @@ async function performSave(data: AppData): Promise<void> {
         logger.warn('Retrying save operation', { attempt });
       }
 
-      // Serialize data
-      const serialized = JSON.stringify(data);
-
-      // Save to both primary and backup storage
-      await AsyncStorage.multiSet([
-        [STORAGE_KEY, serialized],
-        [BACKUP_KEY, serialized],
-      ]);
+      // Save to both primary and backup storage (encrypted)
+      await Promise.all([saveEncrypted(STORAGE_KEY, data), saveEncrypted(BACKUP_KEY, data)]);
 
       logger.debug('Data saved to storage and backup');
       return; // Success!
@@ -478,11 +459,7 @@ async function performSave(data: AppData): Promise<void> {
 
       // If this was the last retry, throw error
       if (attempt === MAX_SAVE_RETRIES) {
-        const appError = createAppError(
-          ErrorCode.UNKNOWN,
-          '데이터 저장에 실패했습니다',
-          lastError
-        );
+        const appError = createAppError(ErrorCode.UNKNOWN, '데이터 저장에 실패했습니다', lastError);
         logAppError(appError);
         throw appError;
       }
@@ -493,11 +470,7 @@ async function performSave(data: AppData): Promise<void> {
   }
 
   // Should never reach here, but just in case
-  throw createAppError(
-    ErrorCode.UNKNOWN,
-    '데이터 저장에 실패했습니다',
-    lastError || undefined
-  );
+  throw createAppError(ErrorCode.UNKNOWN, '데이터 저장에 실패했습니다', lastError || undefined);
 }
 
 /**

@@ -32,14 +32,7 @@
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import { ChecklistItem } from '../types';
 import { validateTitle, normalizeTitle } from '../utils/validation';
 import { colors } from '../styles/colors';
@@ -57,13 +50,15 @@ export interface ChecklistItemViewProps {
 
   /**
    * Callback when checkbox is toggled
+   * If undefined, the checkbox will be read-only (disabled)
    */
-  onToggle: () => void;
+  onToggle?: () => void;
 
   /**
    * Callback when item is deleted
+   * If undefined, the delete button will be hidden
    */
-  onDelete: () => void;
+  onDelete?: () => void;
 
   /**
    * Callback when item title is updated
@@ -162,20 +157,33 @@ const ChecklistItemView: React.FC<ChecklistItemViewProps> = ({
   // Accessibility label for checkbox
   const checkboxLabel = `${item.title}, ${item.done ? '완료됨' : '미완료'}`;
 
+  // Read-only mode when onToggle is undefined
+  const isReadOnly = !onToggle;
+
+  // Hide delete button when onDelete is undefined
+  const canDelete = !!onDelete;
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isReadOnly && styles.containerReadOnly]}>
       {/* Checkbox */}
       <TouchableOpacity
         onPress={onToggle}
         style={styles.checkboxContainer}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // Extend touch area to 44x44
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         accessible={true}
         accessibilityLabel={checkboxLabel}
-        accessibilityHint="탭하여 완료 상태 전환"
+        accessibilityHint={isReadOnly ? '읽기 전용' : '탭하여 완료 상태 전환'}
         accessibilityRole="checkbox"
-        accessibilityState={{ checked: item.done }}
+        accessibilityState={{ checked: item.done, disabled: isReadOnly }}
+        disabled={isReadOnly}
       >
-        <View style={[styles.checkbox, item.done && styles.checkboxChecked]}>
+        <View
+          style={[
+            styles.checkbox,
+            item.done && styles.checkboxChecked,
+            isReadOnly && styles.checkboxReadOnly,
+          ]}
+        >
           {item.done && <Text style={styles.checkmark}>✓</Text>}
         </View>
       </TouchableOpacity>
@@ -201,37 +209,34 @@ const ChecklistItemView: React.FC<ChecklistItemViewProps> = ({
         ) : (
           <TouchableOpacity
             onPress={onToggle}
-            onLongPress={handleLongPress}
+            onLongPress={isReadOnly ? undefined : handleLongPress}
             delayLongPress={500}
             style={styles.titleContainer}
             accessible={true}
             accessibilityLabel={checkboxLabel}
-            accessibilityHint="길게 눌러서 편집"
+            accessibilityHint={isReadOnly ? '읽기 전용' : '길게 눌러서 편집'}
+            disabled={isReadOnly}
           >
-            <Text
-              style={[
-                styles.title,
-                item.done && styles.titleCompleted,
-              ]}
-              numberOfLines={2}
-            >
+            <Text style={[styles.title, item.done && styles.titleCompleted]} numberOfLines={2}>
               {item.title}
             </Text>
           </TouchableOpacity>
         )}
       </View>
 
-      {/* Delete Button */}
-      <TouchableOpacity
-        onPress={handleDelete}
-        style={styles.deleteButton}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // Extend touch area to 44x44
-        accessible={true}
-        accessibilityLabel="항목 삭제"
-        accessibilityRole="button"
-      >
-        <Text style={styles.deleteButtonText}>✕</Text>
-      </TouchableOpacity>
+      {/* Delete Button (hidden when onDelete is undefined) */}
+      {canDelete && (
+        <TouchableOpacity
+          onPress={handleDelete}
+          style={styles.deleteButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // Extend touch area to 44x44
+          accessible={true}
+          accessibilityLabel="항목 삭제"
+          accessibilityRole="button"
+        >
+          <Text style={styles.deleteButtonText}>✕</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -253,6 +258,13 @@ const styles = StyleSheet.create({
   },
 
   /**
+   * Read-only container style
+   */
+  containerReadOnly: {
+    opacity: 0.7,
+  },
+
+  /**
    * Checkbox container
    * - 24x24 visual size
    * - Uses hitSlop to extend touch area to 44x44
@@ -262,17 +274,17 @@ const styles = StyleSheet.create({
   },
 
   /**
-   * Checkbox visual
-   * - 24x24 square
-   * - Border with primary color
-   * - Rounded corners
+   * Checkbox visual - Modern Minimal Design
+   * - 24x24 circular shape
+   * - Light border for unchecked state
+   * - Smooth corners
    */
   checkbox: {
     width: 24,
     height: 24,
-    borderRadius: 6,
+    borderRadius: 12,
     borderWidth: 2,
-    borderColor: colors.primary,
+    borderColor: '#d4d4d8',
     backgroundColor: colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
@@ -280,20 +292,28 @@ const styles = StyleSheet.create({
 
   /**
    * Checked checkbox state
-   * - Filled with primary color
+   * - Gradient green background
    */
   checkboxChecked: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.success,
+    borderColor: colors.success,
+  },
+
+  /**
+   * Read-only checkbox style
+   */
+  checkboxReadOnly: {
+    opacity: 0.5,
   },
 
   /**
    * Checkmark symbol
    * - White color for contrast
-   * - Bold font weight
+   * - Smaller size for circular checkbox
    */
   checkmark: {
     color: colors.surface,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '700',
   },
 
@@ -315,23 +335,24 @@ const styles = StyleSheet.create({
   },
 
   /**
-   * Item title text
-   * - Body typography (16px, regular)
+   * Item title text - Modern Minimal Design
+   * - Body typography (15px, regular)
    * - Primary text color
    */
   title: {
     ...typography.body,
     color: colors.textPrimary,
+    lineHeight: 22,
   },
 
   /**
    * Completed item title style
    * - Strikethrough decoration
-   * - Secondary text color for de-emphasis
+   * - Lighter gray for de-emphasis
    */
   titleCompleted: {
     textDecorationLine: 'line-through',
-    color: colors.textSecondary,
+    color: colors.textDisabled,
   },
 
   /**
@@ -342,16 +363,16 @@ const styles = StyleSheet.create({
   },
 
   /**
-   * Edit mode text input
+   * Edit mode text input - Modern Minimal Design
    * - Body typography
-   * - Border for visual feedback
-   * - Padding for comfort
+   * - Lighter border with primary focus
+   * - More rounded corners
    */
   editInput: {
     ...typography.body,
     borderWidth: 1,
     borderColor: colors.primary,
-    borderRadius: 6,
+    borderRadius: 8,
     padding: spacing.sm,
     color: colors.textPrimary,
     backgroundColor: colors.surface,

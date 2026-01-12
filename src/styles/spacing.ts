@@ -47,10 +47,10 @@ export interface Spacing {
  *        4 → 8 → 12 → 16 → 20 → 24
  */
 export const spacing: Spacing = {
-  xs: 4,    // Extra small - tight spacing
-  sm: 8,    // Small - compact spacing
-  md: 12,   // Medium - moderate spacing
-  lg: 16,   // Large - standard padding/margin
-  xl: 20,   // Extra large - section spacing
-  xxl: 24,  // Extra extra large - major spacing
+  xs: 4, // Extra small - tight spacing
+  sm: 8, // Small - compact spacing
+  md: 12, // Medium - moderate spacing
+  lg: 16, // Large - standard padding/margin
+  xl: 20, // Extra large - section spacing
+  xxl: 24, // Extra extra large - major spacing
 } as const;

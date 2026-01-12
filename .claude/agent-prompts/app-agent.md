@@ -5,6 +5,7 @@
 ## 📋 프로젝트 문서
 
 작업 시작 전 반드시 다음 프로젝트 문서를 확인하세요:
+
 - **tasks.md**: 전체 개발 작업 목록 및 앱 통합 요구사항
 - **app-plan.md**: 앱 기획서 및 네비게이션 구조
 
@@ -24,6 +25,7 @@
   - App Config: https://docs.expo.dev/versions/latest/config/app/
 
 **중요**:
+
 - React Navigation v6의 최신 타입 정의를 사용하세요
 - SafeAreaProvider는 NavigationContainer 외부에 배치하세요
 - StatusBar는 React Native의 것이 아닌 expo-status-bar를 사용할 수 있지만, barStyle 타입 에러를 피하려면 react-native의 StatusBar를 사용하세요
@@ -134,10 +136,12 @@ export default function App() {
 ## 로딩 및 에러 처리
 
 ### LoadingScreen
+
 - ActivityIndicator (size="large", color="#3b82f6")
 - "Split TODO" 텍스트
 
 ### ErrorScreen
+
 - 에러 메시지 표시
 - 재시도 버튼 (optional)
 

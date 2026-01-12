@@ -26,3 +26,17 @@ export { default as Button } from './Button';
 export type { ButtonProps, ButtonVariant } from './Button';
 
 export { default as ErrorBoundary } from './ErrorBoundary';
+
+export { ConfettiCelebration } from './ConfettiCelebration';
+
+export { WeeklyCalendarNavigation } from './WeeklyCalendarNavigation';
+
+export {
+  UnifiedCalendarView,
+  WEEKLY_CALENDAR_HEIGHT,
+  MONTHLY_CALENDAR_HEIGHT,
+  calculateMonthlyCalendarHeight,
+} from './UnifiedCalendarView';
+
+// Re-export calendar utilities
+export { calculateWeekCountForMonth } from './calendar/utils';

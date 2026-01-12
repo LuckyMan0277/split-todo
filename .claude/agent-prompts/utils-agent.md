@@ -5,6 +5,7 @@
 ## 📋 프로젝트 문서
 
 작업 시작 전 반드시 다음 프로젝트 문서를 확인하세요:
+
 - **tasks.md**: 전체 개발 작업 목록 및 요구사항
 - **app-plan.md**: 앱 기획서 및 유틸리티 요구사항
 
@@ -39,6 +40,7 @@
 ## 구현 요구사항
 
 ### UUID (uuid.ts)
+
 ```typescript
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
@@ -49,11 +51,13 @@ export function generateId(): string {
 ```
 
 ### Progress (progress.ts)
+
 - items.length가 0이면 { done: 0, total: 0, percent: 0 }
 - done = items.filter(i => i.done).length
-- percent = Math.round((done / total) * 100)
+- percent = Math.round((done / total) \* 100)
 
 ### Validation (validation.ts)
+
 - 제목: trim 후 1~120자
 - normalizeTitle: trim + 개행 제거
 - Task 최대 1000개

@@ -73,10 +73,7 @@ export interface AddItemInputProps {
  * - Input validation
  * - Error handling
  */
-const AddItemInput: React.FC<AddItemInputProps> = ({
-  onAdd,
-  placeholder = '새 항목 추가',
-}) => {
+const AddItemInput: React.FC<AddItemInputProps> = ({ onAdd, placeholder = '새 항목 추가' }) => {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 

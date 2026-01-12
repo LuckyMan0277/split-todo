@@ -20,7 +20,7 @@ export interface TypographyStyle {
   /** Font size in pixels */
   fontSize: number;
   /** Font weight (CSS font-weight values as strings for React Native) */
-  fontWeight: '400' | '600' | '700';
+  fontWeight: '400' | '500' | '600' | '700';
   /** Line height in pixels for consistent vertical rhythm */
   lineHeight: number;
 }
@@ -42,41 +42,41 @@ export interface Typography {
 }
 
 /**
- * Application typography system
+ * Application typography system - Modern Minimal Design
  *
  * Usage guidelines:
- * - Use `h1` for screen titles and main headings (TaskDetailScreen title)
- * - Use `h2` for section headers (e.g., "세부 단계" section)
- * - Use `h3` for card titles (TaskCard titles in list)
- * - Use `body` for main content, buttons, and input text
+ * - Use `h1` for screen titles and main headings
+ * - Use `h2` for section headers and important messages
+ * - Use `h3` for card titles and subsection headings
+ * - Use `body` for main content, buttons, and input text (slightly larger)
  * - Use `caption` for metadata, progress text, and supporting information
  *
- * Line height is set to 1.5x font size for optimal readability on mobile devices.
+ * Font sizes are slightly increased for better readability and modern feel.
  */
 export const typography: Typography = {
   h1: {
     fontSize: 28,
-    fontWeight: '700',  // Bold
-    lineHeight: 36,     // 1.29x for large headings
+    fontWeight: '700', // Bold
+    lineHeight: 36, // 1.29x for large headings
   },
   h2: {
-    fontSize: 24,
-    fontWeight: '600',  // Semibold
-    lineHeight: 32,     // 1.33x
+    fontSize: 20,
+    fontWeight: '600', // Semibold
+    lineHeight: 28, // 1.4x
   },
   h3: {
-    fontSize: 20,
-    fontWeight: '600',  // Semibold
-    lineHeight: 28,     // 1.4x
+    fontSize: 17,
+    fontWeight: '600', // Semibold
+    lineHeight: 24, // 1.41x
   },
   body: {
-    fontSize: 16,
-    fontWeight: '400',  // Regular
-    lineHeight: 24,     // 1.5x - optimal for readability
+    fontSize: 15,
+    fontWeight: '400', // Regular
+    lineHeight: 22, // 1.47x - optimal for readability
   },
   caption: {
-    fontSize: 14,
-    fontWeight: '400',  // Regular
-    lineHeight: 20,     // 1.43x
+    fontSize: 13,
+    fontWeight: '500', // Medium for better hierarchy
+    lineHeight: 18, // 1.38x
   },
 } as const;

@@ -2,7 +2,7 @@
  * SettingsScreen Component
  *
  * Settings and preferences screen for the application.
- * Features data management, app information, and accessibility settings.
+ * Features app information and accessibility settings.
  *
  * Accessibility:
  * - Full screen reader support
@@ -10,28 +10,15 @@
  * - Clear section headings
  *
  * Features:
- * - Data export/import buttons
- * - Delete completed tasks button
  * - App version display
  * - Storage usage display
  * - Haptic feedback toggle
  */
 
-import React, { useState, useMemo } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  Alert,
-  Switch,
-  Platform,
-} from 'react-native';
+import React, { useState, useMemo, useEffect } from 'react';
+import { View, Text, ScrollView, StyleSheet, Switch, Platform, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTaskStore } from '../store/taskStore';
-import { Button } from '../components';
-import { exportData } from '../services/backup';
-import { cleanOldCompletedTasks } from '../services/storage';
 import { calculateStorageSize } from '../utils/validation';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
@@ -47,9 +34,8 @@ const HAPTIC_ENABLED_KEY = 'HAPTIC_ENABLED';
  * SettingsScreen component implementation
  */
 const SettingsScreen: React.FC = () => {
-  const { tasks } = useTaskStore();
-  const [isExporting, setIsExporting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const { tasks, settings, toggleCelebration, updateDailySaveHour, toggleWeekStartsOn } =
+    useTaskStore();
   const [hapticEnabled, setHapticEnabled] = useState(true);
 
   // Calculate storage statistics
@@ -73,93 +59,6 @@ const SettingsScreen: React.FC = () => {
   }, [tasks]);
 
   /**
-   * Handles data export
-   */
-  const handleExportData = async () => {
-    try {
-      setIsExporting(true);
-      const appData = { schemaVersion: 1, tasks };
-      await exportData(appData);
-      Alert.alert('내보내기 완료', '백업 파일이 저장되었습니다');
-    } catch (error: any) {
-      Alert.alert(
-        '내보내기 실패',
-        error.message || '데이터 내보내기에 실패했습니다'
-      );
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  /**
-   * Handles data import
-   * Note: In a real implementation, this would use DocumentPicker to select a file
-   */
-  const handleImportData = async () => {
-    Alert.alert(
-      '데이터 가져오기',
-      '이 기능은 파일 선택기가 필요합니다.\n현재 버전에서는 지원하지 않습니다.',
-      [{ text: '확인' }]
-    );
-    // In a real implementation:
-    // 1. Use react-native-document-picker to select a file
-    // 2. Call importData(filePath)
-    // 3. Validate the data
-    // 4. Show confirmation dialog (will overwrite existing data)
-    // 5. Update store with new data
-  };
-
-  /**
-   * Handles deleting completed tasks
-   */
-  const handleDeleteCompleted = async () => {
-    const completedCount = tasks.filter((task) => {
-      const completedItems = task.items.filter((item) => item.done).length;
-      return completedItems === task.items.length && task.items.length > 0;
-    }).length;
-
-    if (completedCount === 0) {
-      Alert.alert('알림', '삭제할 완료된 할 일이 없습니다');
-      return;
-    }
-
-    Alert.alert(
-      '완료된 할 일 삭제',
-      `${completedCount}개의 완료된 할 일을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`,
-      [
-        {
-          text: '취소',
-          style: 'cancel',
-        },
-        {
-          text: '삭제',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              setIsDeleting(true);
-              const appData = { schemaVersion: 1, tasks };
-              const cleanedData = cleanOldCompletedTasks(appData);
-
-              // Update store with cleaned data
-              useTaskStore.setState({ tasks: cleanedData.tasks });
-
-              Alert.alert('삭제 완료', `${completedCount}개의 할 일이 삭제되었습니다`);
-            } catch (error: any) {
-              Alert.alert(
-                '삭제 실패',
-                error.message || '할 일 삭제에 실패했습니다'
-              );
-            } finally {
-              setIsDeleting(false);
-            }
-          },
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  /**
    * Handles haptic feedback toggle
    */
   const handleHapticToggle = async (value: boolean) => {
@@ -167,20 +66,22 @@ const SettingsScreen: React.FC = () => {
     try {
       await AsyncStorage.setItem(HAPTIC_ENABLED_KEY, JSON.stringify(value));
     } catch (error) {
-      console.error('Failed to save haptic setting', error);
+      console.error('Failed to save haptic setting:', error);
     }
   };
 
-  // Load haptic setting on mount
-  React.useEffect(() => {
+  /**
+   * Load haptic feedback setting on mount
+   */
+  useEffect(() => {
     const loadHapticSetting = async () => {
       try {
-        const saved = await AsyncStorage.getItem(HAPTIC_ENABLED_KEY);
-        if (saved !== null) {
-          setHapticEnabled(JSON.parse(saved));
+        const value = await AsyncStorage.getItem(HAPTIC_ENABLED_KEY);
+        if (value !== null) {
+          setHapticEnabled(JSON.parse(value));
         }
       } catch (error) {
-        console.error('Failed to load haptic setting', error);
+        console.error('Failed to load haptic setting:', error);
       }
     };
     loadHapticSetting();
@@ -188,43 +89,6 @@ const SettingsScreen: React.FC = () => {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      {/* Data Management Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>데이터 관리</Text>
-
-        <Button
-          variant="primary"
-          onPress={handleExportData}
-          loading={isExporting}
-          style={styles.button}
-          accessibilityLabel="데이터 내보내기"
-          accessibilityHint="백업 파일을 생성하여 저장합니다"
-        >
-          데이터 내보내기
-        </Button>
-
-        <Button
-          variant="secondary"
-          onPress={handleImportData}
-          style={styles.button}
-          accessibilityLabel="데이터 가져오기"
-          accessibilityHint="백업 파일에서 데이터를 복원합니다"
-        >
-          데이터 가져오기
-        </Button>
-
-        <Button
-          variant="danger"
-          onPress={handleDeleteCompleted}
-          loading={isDeleting}
-          style={styles.button}
-          accessibilityLabel="완료된 할 일 삭제"
-          accessibilityHint="100% 완료된 할 일을 모두 삭제합니다"
-        >
-          완료된 할 일 삭제
-        </Button>
-      </View>
-
       {/* Storage Info Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>저장 공간</Text>
@@ -257,9 +121,7 @@ const SettingsScreen: React.FC = () => {
         <View style={styles.settingRow}>
           <View style={styles.settingTextContainer}>
             <Text style={styles.settingLabel}>햅틱 피드백</Text>
-            <Text style={styles.settingDescription}>
-              체크박스 토글 시 진동 피드백 제공
-            </Text>
+            <Text style={styles.settingDescription}>체크박스 토글 시 진동 피드백 제공</Text>
           </View>
           <Switch
             value={hapticEnabled}
@@ -271,6 +133,80 @@ const SettingsScreen: React.FC = () => {
             accessibilityLabel="햅틱 피드백 설정"
             accessibilityRole="switch"
             accessibilityState={{ checked: hapticEnabled }}
+          />
+        </View>
+
+        <View style={styles.settingRow}>
+          <View style={styles.settingTextContainer}>
+            <Text style={styles.settingLabel}>완료 축하 효과</Text>
+            <Text style={styles.settingDescription}>진행률 100% 달성 시 축하 애니메이션 표시</Text>
+          </View>
+          <Switch
+            value={settings.celebrationEnabled}
+            onValueChange={toggleCelebration}
+            trackColor={{ false: colors.border, true: colors.primary }}
+            thumbColor={colors.surface}
+            ios_backgroundColor={colors.border}
+            accessible={true}
+            accessibilityLabel="완료 축하 효과 설정"
+            accessibilityRole="switch"
+            accessibilityState={{ checked: settings.celebrationEnabled }}
+          />
+        </View>
+      </View>
+
+      {/* Calendar Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>캘린더</Text>
+
+        <View style={styles.settingRow}>
+          <View style={styles.settingTextContainer}>
+            <Text style={styles.settingLabel}>일일 자동 저장 시간</Text>
+            <Text style={styles.settingDescription}>
+              오늘 할 일 완료 기록을 자동 저장할 시간 (0-23시)
+            </Text>
+          </View>
+          <View style={styles.timeInputContainer}>
+            <TextInput
+              style={styles.timeInput}
+              value={String(settings.dailySaveHour)}
+              onChangeText={(text) => {
+                const hour = parseInt(text, 10);
+                if (!isNaN(hour) && hour >= 0 && hour <= 23) {
+                  updateDailySaveHour(hour);
+                } else if (text === '') {
+                  // Allow empty for editing
+                  return;
+                }
+              }}
+              keyboardType="number-pad"
+              maxLength={2}
+              accessible={true}
+              accessibilityLabel="저장 시간"
+              accessibilityHint="0부터 23 사이의 시간을 입력하세요"
+            />
+            <Text style={styles.timeUnit}>시</Text>
+          </View>
+        </View>
+
+        <View style={styles.settingRow}>
+          <View style={styles.settingTextContainer}>
+            <Text style={styles.settingLabel}>주 시작 요일</Text>
+            <Text style={styles.settingDescription}>
+              {settings.weekStartsOn === 0 ? '일요일부터 시작' : '월요일부터 시작'}
+            </Text>
+          </View>
+          <Switch
+            value={settings.weekStartsOn === 1}
+            onValueChange={toggleWeekStartsOn}
+            trackColor={{ false: colors.border, true: colors.primary }}
+            thumbColor={colors.surface}
+            ios_backgroundColor={colors.border}
+            accessible={true}
+            accessibilityLabel="주 시작 요일 설정"
+            accessibilityRole="switch"
+            accessibilityState={{ checked: settings.weekStartsOn === 1 }}
+            accessibilityHint="켜면 월요일부터, 끄면 일요일부터 시작합니다"
           />
         </View>
       </View>
@@ -291,14 +227,10 @@ const SettingsScreen: React.FC = () => {
 
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>플랫폼:</Text>
-          <Text style={styles.infoValue}>
-            {Platform.OS === 'ios' ? 'iOS' : 'Android'}
-          </Text>
+          <Text style={styles.infoValue}>{Platform.OS === 'ios' ? 'iOS' : 'Android'}</Text>
         </View>
 
-        <Text style={styles.footerText}>
-          할 일을 작은 단계로 쪼개어 달성하세요
-        </Text>
+        <Text style={styles.footerText}>할 일을 작은 단계로 쪼개어 달성하세요</Text>
       </View>
     </ScrollView>
   );
@@ -337,13 +269,6 @@ const styles = StyleSheet.create({
     ...typography.h2,
     color: colors.textPrimary,
     marginBottom: spacing.lg,
-  },
-
-  /**
-   * Button with margin
-   */
-  button: {
-    marginBottom: spacing.md,
   },
 
   /**
@@ -421,5 +346,39 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.lg,
     fontStyle: 'italic',
+  },
+
+  /**
+   * Time input container
+   */
+  timeInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  /**
+   * Time input
+   */
+  timeInput: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    textAlign: 'center',
+    minWidth: 50,
+    backgroundColor: colors.surface,
+  },
+
+  /**
+   * Time unit label
+   */
+  timeUnit: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    marginLeft: 8,
   },
 });

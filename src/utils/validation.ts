@@ -11,7 +11,7 @@ import { ValidationResult, Task, ChecklistItem, AppData } from '../types';
 const MIN_TITLE_LENGTH = 1;
 const MAX_TITLE_LENGTH = 120;
 const MAX_TASK_COUNT = 200; // Updated from 1000 to 200 based on AsyncStorage limitations
-const MAX_ITEM_COUNT = 50;  // Updated from 200 to 50 based on AsyncStorage limitations
+const MAX_ITEM_COUNT = 50; // Updated from 200 to 50 based on AsyncStorage limitations
 const MAX_STORAGE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
 
 /**
@@ -91,9 +91,9 @@ export function validateTitle(title: string): ValidationResult {
  */
 export function normalizeTitle(title: string): string {
   return title
-    .trim()                           // Remove leading/trailing whitespace
-    .replace(/[\r\n]+/g, ' ')        // Replace newlines with spaces
-    .replace(/\s+/g, ' ');           // Collapse multiple spaces
+    .trim() // Remove leading/trailing whitespace
+    .replace(/[\r\n]+/g, ' ') // Replace newlines with spaces
+    .replace(/\s+/g, ' '); // Collapse multiple spaces
 }
 
 /**

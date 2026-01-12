@@ -5,6 +5,7 @@
 ## 📋 프로젝트 문서
 
 작업 시작 전 반드시 다음 프로젝트 문서를 확인하세요:
+
 - **tasks.md**: 전체 개발 작업 목록 및 테스트 요구사항
 - **app-plan.md**: 앱 기획서 및 테스트 전략
 
@@ -24,6 +25,7 @@
 - **AsyncStorage Mocking**: https://react-native-async-storage.github.io/async-storage/docs/advanced/jest
 
 **중요**:
+
 - jest-expo preset을 사용하세요
 - AsyncStorage를 반드시 mock 하세요
 - React Native 컴포넌트 테스트 시 @testing-library/react-native를 사용하세요
@@ -43,6 +45,7 @@
 ## 테스트 대상
 
 ### Utils Tests
+
 - `calcProgress()`: 빈 배열, 전체 완료, 일부 완료
 - `validateTitle()`: 빈 문자열, 공백, 120자 초과
 - `normalizeTitle()`: 공백, 개행 제거
@@ -50,12 +53,14 @@
 - `checkItemLimit()`: 200개 미만, 이상
 
 ### Store Tests
+
 - `addTask()`: 정상 추가, 검증 실패
 - `toggleChecklistItem()`: 체크/해제
 - `deleteTask()`: 삭제 확인
 - `scheduleSave()`: debounce 동작
 
 ### Storage Tests
+
 - `loadAppData()`: 정상 로드, 백업 사용, 빈 데이터
 - `saveAppData()`: 성공, 재시도, 실패
 - 마이그레이션 시나리오
@@ -68,7 +73,7 @@ module.exports = {
   preset: 'jest-expo',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)'
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)',
   ],
 };
 ```
@@ -112,7 +117,7 @@ describe('calcProgress', () => {
       items: [
         { id: '1', title: 'a', done: true },
         { id: '2', title: 'b', done: true },
-      ]
+      ],
     };
     expect(calcProgress(task).percent).toBe(100);
   });

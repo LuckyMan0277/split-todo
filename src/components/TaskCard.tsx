@@ -23,14 +23,7 @@
  */
 
 import React, { useMemo } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { Task } from '../types';
 import { calcProgress } from '../utils/progress';
 import { colors } from '../styles/colors';
@@ -90,14 +83,17 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onPress, style }) => {
         {task.title}
       </Text>
 
-      {/* Progress Bar */}
-      <View style={styles.progressSection}>
-        <ProgressBar progress={progress.percent} />
+      {/* Progress Section */}
+      <View style={styles.progressContainer}>
+        <View style={styles.progressBarWrapper}>
+          <ProgressBar progress={progress.percent} />
+        </View>
+        <Text style={styles.progressPercent}>{progress.percent}%</Text>
       </View>
 
-      {/* Progress Text */}
+      {/* Progress Detail Text */}
       <Text style={styles.progressText}>
-        {progress.done}/{progress.total} 완료 ({progress.percent}%)
+        {progress.done}/{progress.total} 완료
       </Text>
     </TouchableOpacity>
   );
@@ -121,35 +117,36 @@ export default React.memo(TaskCard, (prevProps, nextProps) => {
 
 const styles = StyleSheet.create({
   /**
-   * Card container
-   * - White surface background
-   * - Elevation for depth
-   * - Rounded corners
-   * - Padding for content spacing
-   * - Minimum height to ensure 44pt touch target
+   * Card container - Modern Minimal Design
+   * - Pure white surface background
+   * - Larger border radius for softer feel (20px)
+   * - More padding for breathing room
+   * - Subtle shadow for depth
+   * - Border for definition
    */
   container: {
     backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: spacing.lg,
+    borderRadius: 20,
+    padding: 20,
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.05)',
     // Shadow for iOS
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.04,
+    shadowRadius: 20,
     // Elevation for Android
     elevation: 2,
-    // Ensure minimum touch target height (44pt)
     minHeight: 44,
   },
 
   /**
    * Task title text
-   * - Uses h3 typography (20px, semibold)
+   * - Uses h3 typography (17px, semibold)
    * - Primary text color for maximum contrast
    * - Max 2 lines with ellipsis
    */
@@ -157,23 +154,45 @@ const styles = StyleSheet.create({
     ...typography.h3,
     color: colors.textPrimary,
     marginBottom: spacing.md,
+    fontWeight: '600',
   },
 
   /**
-   * Progress bar section
-   * - Spacing around the progress bar
+   * Progress container - horizontal layout
    */
-  progressSection: {
-    marginBottom: spacing.sm,
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
   },
 
   /**
-   * Progress text (n/m 완료, percent%)
-   * - Uses caption typography (14px, regular)
+   * Progress bar wrapper - takes remaining space
+   */
+  progressBarWrapper: {
+    flex: 1,
+  },
+
+  /**
+   * Progress percent text
+   * - Bold percentage display
+   * - Primary gradient color
+   */
+  progressPercent: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+
+  /**
+   * Progress detail text (n/m 완료)
+   * - Uses caption typography (13px, medium)
    * - Secondary text color for hierarchy
    */
   progressText: {
     ...typography.caption,
     color: colors.textSecondary,
+    fontWeight: '500',
   },
 });

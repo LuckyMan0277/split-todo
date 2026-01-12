@@ -2,44 +2,47 @@
   "expo": {
     "name": "Split TODO",
     "slug": "split-todo",
+    "scheme": "split-todo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.splittodo",
+      "supportsTablet": false,
+      "bundleIdentifier": "com.jaeyun.splittodo",
       "infoPlist": {
-        "UIRequiredDeviceCapabilities": [
-          "armv7"
-        ],
+        "UIRequiredDeviceCapabilities": ["armv7"],
         "NSLocalNetworkUsageDescription": "This app uses local network functionality",
-        "NSBonjourServiceTypes": [
-          "_http._tcp"
-        ]
+        "NSBonjourServiceTypes": ["_http._tcp"]
       },
       "config": {
         "usesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.yourcompany.splittodo",
+      "package": "com.jaeyun.splittodo",
       "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
+      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "category": ["BROWSABLE", "DEFAULT"],
+          "data": {
+            "scheme": "split-todo"
+          }
+        }
       ]
     },
     "web": {
@@ -56,7 +59,9 @@
             "minSdkVersion": 24
           }
         }
-      ]
+      ],
+      "expo-secure-store",
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {

@@ -40,11 +40,7 @@ import {
 import * as Haptics from 'expo-haptics';
 import { debounce } from 'lodash';
 import { useTaskStore } from '../store/taskStore';
-import {
-  ProgressBar,
-  ChecklistItemView,
-  AddItemInput,
-} from '../components';
+import { ProgressBar, ChecklistItemView, AddItemInput, ConfettiCelebration } from '../components';
 import { colors } from '../styles/colors';
 import { typography } from '../styles/typography';
 import { spacing } from '../styles/spacing';
@@ -66,10 +62,7 @@ interface TaskDetailScreenProps {
 /**
  * TaskDetailScreen component implementation
  */
-const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
-  route,
-  navigation,
-}) => {
+const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({ route, navigation }) => {
   const { taskId } = route.params;
   const {
     getTask,
@@ -79,11 +72,15 @@ const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
     toggleChecklistItem,
     updateChecklistItem,
     deleteChecklistItem,
+    settings,
   } = useTaskStore();
 
   const task = getTask(taskId);
   const [titleInput, setTitleInput] = useState(task?.title || '');
   const [previousProgress, setPreviousProgress] = useState(0);
+
+  // Celebration state
+  const [showCelebration, setShowCelebration] = useState(false);
 
   // Calculate progress
   const progress = useMemo(() => {
@@ -133,18 +130,21 @@ const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
     );
   };
 
-  // Haptic feedback on 100% completion
+  // Haptic feedback and celebration on 100% completion
   useEffect(() => {
     if (progress.percent === 100 && previousProgress < 100) {
       // Just reached 100% completion
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(
-        (error) => {
-          console.debug('Haptic feedback failed', error);
-        }
-      );
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch((error) => {
+        console.debug('Haptic feedback failed', error);
+      });
+
+      // Show celebration if enabled
+      if (settings.celebrationEnabled) {
+        setShowCelebration(true);
+      }
     }
     setPreviousProgress(progress.percent);
-  }, [progress.percent]);
+  }, [progress.percent, settings.celebrationEnabled]);
 
   // Update title input when task changes
   useEffect(() => {
@@ -175,9 +175,7 @@ const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
           accessibilityLabel="할 일 삭제"
           accessibilityRole="button"
         >
-          <Text style={[styles.headerButtonText, styles.deleteButtonText]}>
-            삭제
-          </Text>
+          <Text style={[styles.headerButtonText, styles.deleteButtonText]}>삭제</Text>
         </TouchableOpacity>
       ),
     });
@@ -203,9 +201,7 @@ const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
   // Render empty checklist state
   const renderEmptyChecklist = () => (
     <View style={styles.emptyChecklistContainer}>
-      <Text style={styles.emptyChecklistText}>
-        세부 단계를 추가해보세요
-      </Text>
+      <Text style={styles.emptyChecklistText}>세부 단계를 추가해보세요</Text>
     </View>
   );
 
@@ -242,9 +238,7 @@ const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
             accessible={true}
             accessibilityLabel="할 일 제목"
           />
-          <Text style={styles.titleCharCounter}>
-            {titleInput.length}/120
-          </Text>
+          <Text style={styles.titleCharCounter}>{titleInput.length}/120</Text>
         </View>
 
         {/* Progress Section */}
@@ -282,13 +276,13 @@ const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
 
           {/* Add Item Input */}
           <View style={styles.addItemContainer}>
-            <AddItemInput
-              placeholder="새 단계 추가"
-              onAdd={handleAddItem}
-            />
+            <AddItemInput placeholder="새 단계 추가" onAdd={handleAddItem} />
           </View>
         </View>
       </ScrollView>
+
+      {/* Celebration Effect */}
+      <ConfettiCelebration visible={showCelebration} onComplete={() => setShowCelebration(false)} />
     </KeyboardAvoidingView>
   );
 };
@@ -386,29 +380,37 @@ const styles = StyleSheet.create({
   },
 
   /**
-   * Progress card
+   * Progress card - Modern Minimal Design
+   * - More rounded corners (20px)
+   * - Glass morphism effect
+   * - Enhanced shadow
+   * - Border for definition
    */
   progressCard: {
     backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: spacing.lg,
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.05)',
     // Shadow for iOS
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.04,
+    shadowRadius: 20,
     // Elevation for Android
     elevation: 2,
   },
 
   /**
-   * Progress title
+   * Progress title - Modern Minimal Design
+   * - Slightly smaller, semibold
    */
   progressTitle: {
-    ...typography.h3,
+    fontSize: 17,
+    fontWeight: '600',
     color: colors.textPrimary,
     marginBottom: spacing.md,
   },
@@ -431,10 +433,12 @@ const styles = StyleSheet.create({
   },
 
   /**
-   * Section title
+   * Section title - Modern Minimal Design
+   * - Slightly smaller, semibold
    */
   sectionTitle: {
-    ...typography.h3,
+    fontSize: 17,
+    fontWeight: '600',
     color: colors.textPrimary,
     marginBottom: spacing.md,
   },

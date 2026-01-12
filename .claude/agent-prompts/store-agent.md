@@ -5,6 +5,7 @@
 ## 📋 프로젝트 문서
 
 작업 시작 전 반드시 다음 프로젝트 문서를 확인하세요:
+
 - **tasks.md**: 전체 개발 작업 목록 및 상태 관리 요구사항
 - **app-plan.md**: 앱 기획서 및 데이터 흐름
 
@@ -42,15 +43,25 @@ interface TaskStore {
   initialize: () => Promise<void>;
 
   // Task CRUD
-  addTask: (title: string) => Promise<{success: boolean, error?: string}>;
-  updateTaskTitle: (taskId: string, newTitle: string) => Promise<{success: boolean, error?: string}>;
+  addTask: (title: string) => Promise<{ success: boolean; error?: string }>;
+  updateTaskTitle: (
+    taskId: string,
+    newTitle: string
+  ) => Promise<{ success: boolean; error?: string }>;
   deleteTask: (taskId: string) => Promise<void>;
   getTask: (taskId: string) => Task | undefined;
 
   // ChecklistItem CRUD
-  addChecklistItem: (taskId: string, itemTitle: string) => Promise<{success: boolean, error?: string}>;
+  addChecklistItem: (
+    taskId: string,
+    itemTitle: string
+  ) => Promise<{ success: boolean; error?: string }>;
   toggleChecklistItem: (taskId: string, itemId: string) => void;
-  updateChecklistItem: (taskId: string, itemId: string, newTitle: string) => Promise<{success: boolean, error?: string}>;
+  updateChecklistItem: (
+    taskId: string,
+    itemId: string,
+    newTitle: string
+  ) => Promise<{ success: boolean; error?: string }>;
   deleteChecklistItem: (taskId: string, itemId: string) => void;
 }
 ```

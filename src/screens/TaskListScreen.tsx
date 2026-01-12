@@ -23,18 +23,20 @@
  * - Navigation to TaskDetailScreen
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
   FlatList,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   Modal,
   StyleSheet,
   Alert,
-  KeyboardAvoidingView,
   Platform,
+  Keyboard,
+  Animated,
 } from 'react-native';
 import { useTaskStore } from '../store/taskStore';
 import { TaskCard, Button } from '../components';
@@ -60,6 +62,39 @@ const TaskListScreen: React.FC<TaskListScreenProps> = ({ navigation }) => {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [isAdding, setIsAdding] = useState(false);
+  const [keyboardHeight] = useState(new Animated.Value(0));
+
+  /**
+   * Keyboard listeners for custom animation
+   */
+  useEffect(() => {
+    const keyboardWillShow = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        Animated.timing(keyboardHeight, {
+          toValue: e.endCoordinates.height,
+          duration: 80, // 키보드 올라오는 속도 (밀리초)
+          useNativeDriver: false,
+        }).start();
+      }
+    );
+
+    const keyboardWillHide = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        Animated.timing(keyboardHeight, {
+          toValue: 0,
+          duration: 200, // 키보드 내려가는 속도 (밀리초)
+          useNativeDriver: false,
+        }).start();
+      }
+    );
+
+    return () => {
+      keyboardWillShow.remove();
+      keyboardWillHide.remove();
+    };
+  }, [keyboardHeight]);
 
   // Filter tasks based on search query
   const filteredTasks = useMemo(() => {
@@ -115,11 +150,7 @@ const TaskListScreen: React.FC<TaskListScreenProps> = ({ navigation }) => {
    * Renders a single task card
    */
   const renderTask = ({ item }: { item: Task }) => (
-    <TaskCard
-      task={item}
-      onPress={() => handleTaskPress(item.id)}
-      style={styles.taskCard}
-    />
+    <TaskCard task={item} onPress={() => handleTaskPress(item.id)} style={styles.taskCard} />
   );
 
   /**
@@ -128,9 +159,7 @@ const TaskListScreen: React.FC<TaskListScreenProps> = ({ navigation }) => {
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
       <Text style={styles.emptyTitle}>할 일을 추가해보세요!</Text>
-      <Text style={styles.emptySubtitle}>
-        + 버튼을 눌러 새로운 할 일을 만들 수 있습니다
-      </Text>
+      <Text style={styles.emptySubtitle}>+ 버튼을 눌러 새로운 할 일을 만들 수 있습니다</Text>
       <Button
         variant="secondary"
         onPress={handleLoadExamples}
@@ -149,9 +178,7 @@ const TaskListScreen: React.FC<TaskListScreenProps> = ({ navigation }) => {
   const renderEmptySearch = () => (
     <View style={styles.emptyContainer}>
       <Text style={styles.emptyTitle}>검색 결과가 없습니다</Text>
-      <Text style={styles.emptySubtitle}>
-        다른 키워드로 검색해보세요
-      </Text>
+      <Text style={styles.emptySubtitle}>다른 키워드로 검색해보세요</Text>
     </View>
   );
 
@@ -186,9 +213,7 @@ const TaskListScreen: React.FC<TaskListScreenProps> = ({ navigation }) => {
           styles.listContent,
           filteredTasks.length === 0 && styles.listContentEmpty,
         ]}
-        ListEmptyComponent={
-          searchQuery.trim() ? renderEmptySearch() : renderEmptyState()
-        }
+        ListEmptyComponent={searchQuery.trim() ? renderEmptySearch() : renderEmptyState()}
         // Performance optimizations
         removeClippedSubviews={true}
         maxToRenderPerBatch={10}
@@ -221,63 +246,67 @@ const TaskListScreen: React.FC<TaskListScreenProps> = ({ navigation }) => {
         transparent={true}
         onRequestClose={() => setIsAddModalVisible(false)}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.modalContainer}
+        <TouchableWithoutFeedback
+          onPress={() => {
+            setIsAddModalVisible(false);
+            setNewTaskTitle('');
+          }}
         >
-          <View style={styles.modalContent}>
-            {/* Modal Header */}
-            <Text style={styles.modalTitle}>새 할 일 추가</Text>
+          <View style={styles.modalContainer}>
+            <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+              <Animated.View style={[styles.modalContent, { marginBottom: keyboardHeight }]}>
+                {/* Modal Header */}
+                <Text style={styles.modalTitle}>새 할 일 추가</Text>
 
-            {/* Title Input */}
-            <TextInput
-              style={styles.modalInput}
-              value={newTaskTitle}
-              onChangeText={setNewTaskTitle}
-              placeholder="할 일 제목"
-              placeholderTextColor={colors.textDisabled}
-              maxLength={120}
-              returnKeyType="done"
-              onSubmitEditing={handleAddTask}
-              autoFocus={true}
-              editable={!isAdding}
-              accessible={true}
-              accessibilityLabel="할 일 제목 입력"
-            />
+                {/* Title Input */}
+                <TextInput
+                  style={styles.modalInput}
+                  value={newTaskTitle}
+                  onChangeText={setNewTaskTitle}
+                  placeholder="할 일 제목"
+                  placeholderTextColor={colors.textDisabled}
+                  maxLength={120}
+                  returnKeyType="done"
+                  onSubmitEditing={handleAddTask}
+                  autoFocus={true}
+                  editable={!isAdding}
+                  accessible={true}
+                  accessibilityLabel="할 일 제목 입력"
+                />
 
-            {/* Character Counter */}
-            <Text style={styles.charCounter}>
-              {newTaskTitle.length}/120
-            </Text>
+                {/* Character Counter */}
+                <Text style={styles.charCounter}>{newTaskTitle.length}/120</Text>
 
-            {/* Action Buttons */}
-            <View style={styles.modalActions}>
-              <Button
-                variant="secondary"
-                onPress={() => {
-                  setIsAddModalVisible(false);
-                  setNewTaskTitle('');
-                }}
-                disabled={isAdding}
-                style={styles.modalButton}
-                accessibilityLabel="취소"
-              >
-                취소
-              </Button>
+                {/* Action Buttons */}
+                <View style={styles.modalActions}>
+                  <Button
+                    variant="secondary"
+                    onPress={() => {
+                      setIsAddModalVisible(false);
+                      setNewTaskTitle('');
+                    }}
+                    disabled={isAdding}
+                    style={styles.modalButton}
+                    accessibilityLabel="취소"
+                  >
+                    취소
+                  </Button>
 
-              <Button
-                variant="primary"
-                onPress={handleAddTask}
-                loading={isAdding}
-                disabled={isAdding || !newTaskTitle.trim()}
-                style={styles.modalButton}
-                accessibilityLabel="추가"
-              >
-                추가
-              </Button>
-            </View>
+                  <Button
+                    variant="primary"
+                    onPress={handleAddTask}
+                    loading={isAdding}
+                    disabled={isAdding || !newTaskTitle.trim()}
+                    style={styles.modalButton}
+                    accessibilityLabel="추가"
+                  >
+                    추가
+                  </Button>
+                </View>
+              </Animated.View>
+            </TouchableWithoutFeedback>
           </View>
-        </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );
@@ -306,14 +335,16 @@ const styles = StyleSheet.create({
   },
 
   /**
-   * Search input field
+   * Search input field - Modern Minimal Design
+   * - More rounded corners (12px)
+   * - Lighter background
    */
   searchInput: {
     ...typography.body,
     height: 44,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 8,
+    borderRadius: 12,
     paddingHorizontal: spacing.md,
     backgroundColor: colors.background,
     color: colors.textPrimary,
@@ -377,31 +408,31 @@ const styles = StyleSheet.create({
   },
 
   /**
-   * Floating Action Button (FAB)
-   * - 56x56pt size
-   * - Bottom-right corner (20pt from edges)
+   * Floating Action Button (FAB) - Modern Minimal Design
+   * - 64x64pt larger size
+   * - Bottom-right corner (24pt from edges)
    * - Circular shape
-   * - Primary color
-   * - Shadow/elevation
+   * - Gradient primary color
+   * - Enhanced shadow with primary color glow
    */
   fab: {
     position: 'absolute',
     bottom: 20,
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    right: 24,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    // Shadow for iOS
-    shadowColor: '#000',
+    // Shadow for iOS with primary color
+    shadowColor: colors.primary,
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 8,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowOpacity: 0.4,
+    shadowRadius: 24,
     // Elevation for Android
     elevation: 8,
   },
@@ -426,12 +457,14 @@ const styles = StyleSheet.create({
   },
 
   /**
-   * Modal content card
+   * Modal content card - Modern Minimal Design
+   * - More rounded corners (24px)
+   * - Increased padding for breathing room
    */
   modalContent: {
     backgroundColor: colors.surface,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     padding: spacing.xxl,
     paddingBottom: Platform.OS === 'ios' ? spacing.xxl + 20 : spacing.xxl,
   },
@@ -446,13 +479,14 @@ const styles = StyleSheet.create({
   },
 
   /**
-   * Modal input field
+   * Modal input field - Modern Minimal Design
+   * - More rounded corners (12px)
    */
   modalInput: {
     ...typography.body,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: spacing.md,
     color: colors.textPrimary,
     backgroundColor: colors.background,

@@ -5,6 +5,7 @@
 ## 📋 프로젝트 문서
 
 작업 시작 전 반드시 다음 프로젝트 문서를 확인하세요:
+
 - **tasks.md**: 전체 개발 작업 목록 및 화면 요구사항
 - **app-plan.md**: 앱 기획서 및 화면 구성
 
@@ -46,6 +47,7 @@ interface TaskListScreenProps {
 ```
 
 ### 구성요소
+
 - SafeAreaView 컨테이너
 - 헤더: "할 일" 제목
 - FlatList: TaskCard 목록
@@ -54,6 +56,7 @@ interface TaskListScreenProps {
 - Modal: Task 추가 폼
 
 ### 기능
+
 - useTaskStore()로 상태 접근
 - addTask() 호출
 - 성공/실패 Alert
@@ -69,6 +72,7 @@ interface TaskDetailScreenProps {
 ```
 
 ### 구성요소
+
 - SafeAreaView 컨테이너
 - 헤더: 뒤로가기 + 삭제 버튼
 - Task 제목 (편집 가능)
@@ -78,6 +82,7 @@ interface TaskDetailScreenProps {
 - Empty State: "세부 단계가 없습니다"
 
 ### 기능
+
 - getTask(taskId)로 데이터 조회
 - 제목 클릭 → TextInput 편집 모드
 - 삭제: Alert "정말 삭제하시겠습니까?"
@@ -98,6 +103,7 @@ interface TaskDetailScreenProps {
 ## 레이아웃
 
 ### TaskListScreen
+
 ```
 ┌─────────────────────┐
 │  할 일              │ Header
@@ -111,6 +117,7 @@ interface TaskDetailScreenProps {
 ```
 
 ### TaskDetailScreen
+
 ```
 ┌─────────────────────┐
 │ ← [제목]         🗑 │ Header

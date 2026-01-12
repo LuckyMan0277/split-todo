@@ -5,6 +5,7 @@
 ## 📋 프로젝트 문서
 
 작업 시작 전 반드시 다음 프로젝트 문서를 확인하세요:
+
 - **tasks.md**: 전체 개발 작업 목록 및 컴포넌트 요구사항
 - **app-plan.md**: 앱 기획서 및 디자인 시스템
 
@@ -48,38 +49,44 @@
 ## 컴포넌트 요구사항
 
 ### TaskCard
+
 ```typescript
 interface TaskCardProps {
   task: Task;
   onPress: () => void;
 }
 ```
+
 - calcProgress()로 진행률 계산
 - 진행률 바: 0-100% width
 - 100% 완료 시 초록색
 - accessibilityLabel 포함
 
 ### ChecklistItemView
+
 ```typescript
 interface ChecklistItemViewProps {
   item: ChecklistItem;
   onToggle: () => void;
   onDelete: () => void;
-  onUpdate: (newTitle: string) => Promise<{success: boolean, error?: string}>;
+  onUpdate: (newTitle: string) => Promise<{ success: boolean; error?: string }>;
 }
 ```
+
 - 체크박스: 24x24, border-radius 6
 - 완료 시 체크마크 ✓
 - 제목 클릭 시 편집 모드
 - 삭제 버튼: Alert 확인 다이얼로그
 
 ### AddItemInput
+
 ```typescript
 interface AddItemInputProps {
-  onAdd: (title: string) => Promise<{success: boolean, error?: string}>;
+  onAdd: (title: string) => Promise<{ success: boolean; error?: string }>;
   placeholder?: string;
 }
 ```
+
 - TextInput + TouchableOpacity 버튼
 - 추가 성공 시 입력 초기화
 - 실패 시 Alert 표시

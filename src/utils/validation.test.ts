@@ -151,9 +151,7 @@ describe('isValidTask', () => {
   const validTask = {
     id: '123',
     title: 'Test Task',
-    items: [
-      { id: '1', title: 'Item 1', done: false },
-    ],
+    items: [{ id: '1', title: 'Item 1', done: false }],
     createdAt: '2025-11-06T00:00:00.000Z',
     updatedAt: '2025-11-06T00:00:00.000Z',
     schemaVersion: 1,
