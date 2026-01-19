@@ -38,7 +38,10 @@
       "Bash(timeout /t 5)",
       "Bash(npm run lint:*)",
       "Bash(npm run format:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
