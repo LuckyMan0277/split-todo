@@ -40,6 +40,7 @@ import TaskDetailScreen from './src/screens/TaskDetailScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import TodayScreen from './src/screens/TodayScreen';
 import TodaySelectScreen from './src/screens/TodaySelectScreen';
+import BallGameScreen from './src/screens/BallGameScreen';
 
 // Store
 import { useTaskStore, cleanupTaskStore } from './src/store/taskStore';
@@ -59,7 +60,12 @@ import { logger } from './src/utils/logger';
 export type RootTabParamList = {
   TaskListTab: undefined;
   TodayTab: undefined;
+  GameTab: undefined;
   SettingsTab: undefined;
+};
+
+export type GameStackParamList = {
+  BallGame: undefined;
 };
 
 export type TaskStackParamList = {
@@ -81,6 +87,7 @@ export type SettingsStackParamList = {
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const TaskStack = createStackNavigator<TaskStackParamList>();
 const TodayStack = createStackNavigator<TodayStackParamList>();
+const GameStack = createStackNavigator<GameStackParamList>();
 const SettingsStack = createStackNavigator<SettingsStackParamList>();
 
 /**
@@ -399,6 +406,14 @@ function App() {
             })}
           />
           <Tab.Screen
+            name="GameTab"
+            component={GameStackNavigator}
+            options={{
+              title: '게임',
+              tabBarIcon: ({ color, size }) => <Text style={{ fontSize: size, color }}>🎯</Text>,
+            }}
+          />
+          <Tab.Screen
             name="SettingsTab"
             component={SettingsStackNavigator}
             options={{
@@ -536,6 +551,38 @@ function TodayStackNavigator() {
         }}
       />
     </TodayStack.Navigator>
+  );
+}
+
+/**
+ * Game Stack Navigator
+ */
+function GameStackNavigator() {
+  return (
+    <GameStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.surface,
+          elevation: 2,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+        },
+        headerTintColor: colors.textPrimary,
+        headerTitleStyle: {
+          ...typography.h3,
+        },
+      }}
+    >
+      <GameStack.Screen
+        name="BallGame"
+        component={BallGameScreen}
+        options={{
+          title: '공 굴리기 게임',
+        }}
+      />
+    </GameStack.Navigator>
   );
 }
 

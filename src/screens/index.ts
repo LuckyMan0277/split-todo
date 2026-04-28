@@ -15,3 +15,4 @@ export { default as TaskDetailScreen } from './TaskDetailScreen';
 export { default as SettingsScreen } from './SettingsScreen';
 export { default as TodayScreen } from './TodayScreen';
 export { default as TodaySelectScreen } from './TodaySelectScreen';
+export { default as BallGameScreen } from './BallGameScreen';
